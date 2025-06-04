@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "express": "^5.1.0",
+    "express-gen-cohor19": "file:",
     "morgan": "^1.10.0"
   },
   "devDependencies": {
