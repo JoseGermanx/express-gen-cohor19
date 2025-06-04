@@ -6,6 +6,7 @@
 // ---> !!! reponder al cliente el resultado de la operación: satisfactorio o no
 
 const registerUser = (req, res) => {
+    // Aquí se recibirían los datos del usuario desde el cuerpo de la solicitud
     const { name, email, password } = req.body
 
     // posibles validaciones
@@ -31,13 +32,59 @@ const registerUser = (req, res) => {
 }
 
 //controlador para iniciar sesión
-// recibir los datos para hacer el login 
+//recibir los datos para hacer el login: email, password
+// Consultar en la base datos la información que entrega el usuario
+//  verificando si el email esta registrado en la DB
+// comprobar si el campo de contraseña coincide (encriptando la contraseña)
+// ---> !!! responder al cliente el resultado de la operación: satisfactorio o no
+
 const loginUser = (req, res) => {
-    res.send("Acá tendremos el controlador de login")
+    // Aquí se recibirían los datos del usuario desde el cuerpo de la solicitud
+    const {email, password} = req.body
+    // posibles validaciones
+    if (!email || !password) {
+        res.status(400).json({
+            message: "Faltan datos para iniciar sesión",
+        })
+        return
+    }
+
+    // lógica para consultar en la BD (email)
+
+    // verificar contraseña
+
+    // respuesta
+    res.status(200).json({
+        message: "Usuario logueado correctamente",
+        data: {
+            email,
+        }
+    })
 }
 
+//controlador para obtener los datos de un usuario
+// recibir el id de usuario a consultar
+// consultar en la base de datos (id) la información del usuario
+// ---> !!! responder al cliente el resultado de la operación: satisfactorio o no
+
 const getUser = (req, res) => {
-    res.send("Acá tendremos el controlador de user")
+    // Aquí se recibiría el id del usuario desde los parámetros de la solicitud
+    const { id } = req.params
+    // posibles validaciones
+    if (!id) {
+        res.status(400).json({
+            message: "Falta el id del usuario a consultar",
+        })
+        return
+    }
+
+    // consultar en la base de datos (id) la información del usuario
+
+    res.status(200).json({
+        message: "Usuario encontrado correctamente",
+        data: {
+            id,
+        }})
 }
 
 
