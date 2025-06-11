@@ -1,11 +1,13 @@
 
 
+const User = require('../models/model.js')
+
 // controlador para registrar un usuario 
 // recibir los datos del nuevo usuario: name, email, password
 // almacenar los datos en la base de datos
 // ---> !!! reponder al cliente el resultado de la operación: satisfactorio o no
 
-const registerUser = (req, res) => {
+const registerUser = async (req, res) => {
     // Aquí se recibirían los datos del usuario desde el cuerpo de la solicitud
     const { name, email, password } = req.body
 
@@ -18,17 +20,28 @@ const registerUser = (req, res) => {
     }
     
     // acá la lógica para almacenar en la BD
+    try{
+        // asíncrono ---> por que evalúa una promesa que se envía a Mongo
+        await User.create({
+            name,
+            email,
+            password
+        })
+
+        res.status(201).json({
+            message: "Usuario registrado correctamente",
+        })
+        return
 
 
-    // respuesta al cliente
-    res.status(201).json({
-        message: "Usuario registrado correctamente",
-        data: {
-        name,
-        email,
-        password
+    } catch(error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Error al registrar el usuario",
+            error: error.message
+        })
     }
-    })
+
 }
 
 //controlador para iniciar sesión
