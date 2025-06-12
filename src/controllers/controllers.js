@@ -93,7 +93,7 @@ const loginUser = async (req, res) => {
         }
 
         // generar un token para el usuario
-        const token = jwt.sign({id: findUser._id}, "la firma secreta")
+        const token = jwt.sign({id: findUser._id}, process.env.SECRET_JWT)
     
         // respuesta si el usuario existe y la contraseña es correcta
         res.status(200).json({

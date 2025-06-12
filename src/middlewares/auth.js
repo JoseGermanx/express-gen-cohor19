@@ -16,7 +16,7 @@ const authJWT = (req, res, next) => {
     try {
         // método para validar el token
         // si el token no es falido, se lanzará un error
-        const decodedToken = jwt.verify(token, "la firma secreta")
+        const decodedToken = jwt.verify(token, process.env.SECRET_JWT)
         
         // decodedToken contiene la información del usuario en payload
         //crear una propiedad en el objeto req para almacenar el id del usuario

@@ -1,3 +1,5 @@
+
+require('dotenv').config() // Cargar las variables de entorno desde el archivo .env
 const app = require('./src/app/app.js')
 
 const { dbConnection } = require('./src/database/conexion.js')
