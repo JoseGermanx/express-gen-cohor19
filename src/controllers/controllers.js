@@ -1,6 +1,8 @@
 
 
 const User = require('../models/model.js')
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 
 // controlador para registrar un usuario 
 // recibir los datos del nuevo usuario: name, email, password
@@ -18,14 +20,20 @@ const registerUser = async (req, res) => {
         })
         return
     }
-    
+
     // acá la lógica para almacenar en la BD
-    try{
+    try {
+
+        // encriptar la contraseña
+        const salt = bcrypt.genSaltSync() //define la dificultad de encriptado
+        const passHash = bcrypt.hashSync(password, salt) //encripta la contraseña
+
+
         // asíncrono ---> por que evalúa una promesa que se envía a Mongo
         await User.create({
             name,
             email,
-            password
+            password: passHash
         })
 
         res.status(201).json({
@@ -34,7 +42,7 @@ const registerUser = async (req, res) => {
         return
 
 
-    } catch(error) {
+    } catch (error) {
         console.log(error)
         res.status(500).json({
             message: "Error al registrar el usuario",
@@ -51,9 +59,9 @@ const registerUser = async (req, res) => {
 // comprobar si el campo de contraseña coincide (encriptando la contraseña)
 // ---> !!! responder al cliente el resultado de la operación: satisfactorio o no
 
-const loginUser = (req, res) => {
+const loginUser = async (req, res) => {
     // Aquí se recibirían los datos del usuario desde el cuerpo de la solicitud
-    const {email, password} = req.body
+    const { email, password } = req.body
     // posibles validaciones
     if (!email || !password) {
         res.status(400).json({
@@ -61,18 +69,47 @@ const loginUser = (req, res) => {
         })
         return
     }
+    try{
+       
+        // lógica para consultar en la BD (email)
+        const findUser = await User.findOne({ email: email })
 
-    // lógica para consultar en la BD (email)
+        // respuesta si el usuario no existe
+        if(!findUser){
+             res.status(404).json({
+                message: "Usuario no encontrado",   
+            })
+            return
+        }    
+    
+        // verificar contraseña
+        const passVerify = bcrypt.compareSync(password, findUser.password) // true o false
 
-    // verificar contraseña
-
-    // respuesta
-    res.status(200).json({
-        message: "Usuario logueado correctamente",
-        data: {
-            email,
+        if(!passVerify){
+            res.status(401).json({
+                message: "Contraseña incorrecta",
+            })
+            return
         }
-    })
+
+        // generar un token para el usuario
+        const token = jwt.sign({id: findUser._id}, "la firma secreta")
+    
+        // respuesta si el usuario existe y la contraseña es correcta
+        res.status(200).json({
+            message: "Usuario logueado correctamente",
+            token: token,
+        })
+
+    } catch(error){
+        console.log(error)
+        res.status(500).json({
+            message: "Error al iniciar sesión",
+            error: error.message
+        })
+        return
+    }
+
 }
 
 //controlador para obtener los datos de un usuario
@@ -97,7 +134,8 @@ const getUser = (req, res) => {
         message: "Usuario encontrado correctamente",
         data: {
             id,
-        }})
+        }
+    })
 }
 
 
