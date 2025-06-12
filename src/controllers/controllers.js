@@ -117,25 +117,40 @@ const loginUser = async (req, res) => {
 // consultar en la base de datos (id) la información del usuario
 // ---> !!! responder al cliente el resultado de la operación: satisfactorio o no
 
-const getUser = (req, res) => {
+const getUser = async (req, res) => {
     // Aquí se recibiría el id del usuario desde los parámetros de la solicitud
-    const { id } = req.params
-    // posibles validaciones
-    if (!id) {
-        res.status(400).json({
-            message: "Falta el id del usuario a consultar",
+    
+ 
+    try {
+
+        // consultar en la base de datos (id) la información del usuario
+    
+        const user = await User.findById(req.userId)
+
+        if(!user){
+            res.status(404).json({
+                message: "Usuario no encontrado",
+            })
+            return
+        }
+    
+        res.status(200).json({
+            message: "Usuario encontrado correctamente",
+            data: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Error al consultar datos del usuario",
+            error: error.message
         })
         return
     }
 
-    // consultar en la base de datos (id) la información del usuario
-
-    res.status(200).json({
-        message: "Usuario encontrado correctamente",
-        data: {
-            id,
-        }
-    })
 }
 
 
